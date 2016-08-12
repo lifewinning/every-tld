@@ -7,13 +7,19 @@
     .arc-center {
       fill: none;
     }
-    .hover{      
+
+    .hover{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    opacity: .7;     
     width: 100%;                  
     padding: 5px;       
     font: 14px sans-serif;    
     background: papayawhip; 
     border: 0px;    
-    pointer-events: none;   
+    pointer-events: none;
+    text-align: center;   
 
   }
 
@@ -33,16 +39,35 @@
     align-items: center;
   }
   #dates{
-    width: 50%;
+    width: 25%;
   }
   #types{
-    width: 50%;
+    width: 25%;
   }
+  #viewunravel{
+    width: 25%;
+  }
+  
+  #list{
+     width: 100%;
+  }
+
   .nav li {
     padding: 5px;
     display: inline-block;
     font: 14px sans-serif;
-    }    
+    background-color: #eee;
+    }
+  .nav li:hover{
+    background-color: papayawhip;
+  }
+
+  .selected li {
+    background-color: papayawhip;
+  }    
+
   .nav h1{
     font-family: sans-serif;
+    font-size: 14px;
+    text-align: center;
   }

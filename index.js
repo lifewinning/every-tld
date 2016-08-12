@@ -9,7 +9,7 @@ var theta = function(r) {
 };
 
 d3.json('tlds-by-year.json', function(data){
-
+selected = []
 types = ["infrastructure","country-code", "sponsored", "generic"]
 
 var color = d3.scale.linear()
@@ -23,20 +23,24 @@ var arc = d3.svg.arc()
 var radius = d3.scale.linear()
   .domain([start, end])
   .range([0, height*.75]);
-
-nav = d3. select("#flex").append("div")
+  
+nav = d3.select("#flex").append("div")
   .attr("id", "nav")
   .attr('class','nav')
 
 dates = nav.append('div')
 .attr('id','dates')
 .html('<h1>Filter By Year</h1>')
-.selectAll('li')
+// .append('li').html('All Years').on('click',function(){ makeSpiral() })
+
+dates.selectAll('li')
 .data(Object.keys(data))
-.enter().append('li')
+.enter().append('li').append('a')
   .style('color',function(key){ return color(key*.1)})
   .html(function(key){return key+" "})
-  .on('click',function(key){makeSpiralbyDate(key,text)})
+  .on('click',function(key){
+      makeSpiralbyDate(key)
+    })
 
 categories = nav.append('div').attr('id','types').html('<h1>Filter By Type</h1>')
 .selectAll('li')
@@ -45,11 +49,13 @@ categories = nav.append('div').attr('id','types').html('<h1>Filter By Type</h1>'
 .html(function(t){return t+" "})
 .on('click',function(t){
   if ( t != "generic"){
-    makeSpiralbyType(t,text)
+    makeSpiralbyType(t)
   } else {
     genericSpiral()
   }
 })
+
+list = d3.select('#flex').append('div').attr('id','list').style('display','none')
 
 hover = d3.select("#flex").append("div")
 .attr("class", "hover")
@@ -60,12 +66,54 @@ var svg = d3.select("#flex").append("svg")
     .attr("height", height*1.75)
     .append("g")
     .attr('id','omg')
-    .attr("transform", "translate(" + width/2 + "," + ((height*1.75)/2) +")");
+    .attr("transform", "translate(" + width/2 + "," + ((height*1.75)/2) +")")
 
-// function makeSpiral(start,end){
+unravel = nav.append('div').attr('id','viewunravel').html('<h1>View As List</h1>')
+.on('click',function(){
+  var svgactive = svg.active ? false : true
+  var seelist = svgactive ? null: 'none'
+  var svgdisplay = svgactive ?  0 : 1
+  var option = svgactive ? '<h1>View as Spiral</h1>' : '<h1>View As List</h1>'
+  
+  d3.select('#omg').transition().attr('width',width).attr('height',height)
+  
+  unravel.html(option)
+  
+  d3.select('svg').style('opacity',svgdisplay)
+  
+  list.style('display',seelist)
+  svg.active = svgactive
+})
 
-// }
+function makeList(){
+  list.html('')
+  .selectAll('span')
+  .data(selected).enter()
+  .append('span')
+  .attr('class','arc-text list')
+  .html(function(s){return s.name+" "})
+  .style('color', function(s){ 
+    y = s.registered.split('-')
+    return color(y[0]*.1)
+  })
+  .on("mouseover", function(s){
+    d3.select(s).style("color", "orange")
+  })
+  .on("click", function(s){
+    hover.style("display", null)
+    .html("<h2>"+s.name+"</h2><p>Registered on: "+s.registered+"</p><p>Sponsored by: "+s.spons+"</p><p>Type: "+s.type+"</p>")
+  })
+  .on("mouseout", function(){
+    d3.select(this).style("color",function(s){
+      year = s.registered.split('-')
+      return color(year[0]*.1)
+    })
+    .style("font-weight",100);
+    });
+}
 
+function makeSpiral(){
+selected = []
 var pieces = d3.range(start, end+0.001, (end-start)/5500);
 
 var spiral = d3.svg.line.radial()
@@ -88,9 +136,9 @@ var text = svg.append("text")
 .style("text-anchor","start")
 .attr("id","textpath")  
 .attr('textLength', function(){
-      p = document.querySelector('.spiral').getTotalLength()
-      return p;
-        })
+    p = document.querySelector('.spiral').getTotalLength()
+    return p;
+})
 
 Object.keys(data).forEach(function(key) {
      data[key].forEach(function(d){
@@ -99,7 +147,7 @@ Object.keys(data).forEach(function(key) {
       .style('fill', color(key*.1))
       .text(d.name+" ")
       .on("mouseover", function(){
-        d3.select(this).style("fill", "orange")
+        d3.select(this).style("color", "orange")
       })
       .on("click", function(){
         hover.style("display", null)
@@ -108,17 +156,25 @@ Object.keys(data).forEach(function(key) {
       .on("mouseout", function(){
         d3.select(this).style("fill",color(key*.1)).style("font-weight",100);
         // hover.style("display","none")
-      });   
+      }); 
+      selected.push(d)  
     })
-})     
+})
+makeList()     
+}
 
-function makeSpiralbyDate(d, text){
+makeSpiral()
+
+function makeSpiralbyDate(d){
+  selected = []
+  text = d3.select('textPath') 
   text.html('')
   .attr('textLength',null)
   hover.style("display","none")
   Object.keys(data).forEach(function(key) {
   if (key == d){
      data[key].forEach(function(d){
+      selected.push(d)
       text.append('tspan')
       .attr('class','arc-text')
       .style('fill', color(key*.1))
@@ -142,10 +198,12 @@ pathh = text[0][0].getBBox().height +15
 
 d3.select('svg').transition().attr('width', pathw).attr('height', pathh)
 d3.select('g').attr('transform','translate('+pathw/2+','+pathh/2+')')
-
+makeList() 
 }
 
-function makeSpiralbyType(t, text){
+function makeSpiralbyType(t){
+  selected = []
+  text = d3.select('textPath')
   text.html('')
   .attr('textLength', null)
   d3.select('svg').transition().attr('height', height)
@@ -155,6 +213,7 @@ function makeSpiralbyType(t, text){
   Object.keys(data).forEach(function(key) {
      data[key].forEach(function(d){
       if (d.type == t){
+      selected.push(d)
       text.append('tspan')
       .attr('class','arc-text')
       .style('fill', color(key*.1))
@@ -178,10 +237,12 @@ pathh = text[0][0].getBBox().height +15
 
 d3.select('svg').transition().attr('width', pathw).attr('height', pathh)
 d3.select('g').attr('transform','translate('+pathw/2+','+pathh/2+')')
-
+makeList() 
 }
 
 function genericSpiral(){
+  selected = []
+  text = d3.select('textPath')
   text.html('')
   .attr('textLength', function(){
      p = document.querySelector('.spiral').getTotalLength()
@@ -195,6 +256,7 @@ function genericSpiral(){
   Object.keys(data).forEach(function(key) {
      data[key].forEach(function(d){
       if (d.type == "generic"){
+      selected.push(d)
        text.append('tspan')
       .attr('class','arc-text')
       // .style('font-size','12px')
@@ -219,9 +281,8 @@ pathh = text[0][0].getBBox().height +15
 
 d3.select('svg').transition().attr('width', pathw).attr('height', pathh)
 d3.select('g').attr('transform','translate('+pathw/2+','+pathh/2+')')
-
+makeList() 
 }
-
 
 });
 
