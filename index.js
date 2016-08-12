@@ -8,6 +8,13 @@ var theta = function(r) {
   return -2*Math.PI*r;
 };
 
+var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+var isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor);
+
+if (isChrome || isSafari){
+  console.log('broken Arabic 4 u')
+}
+
 d3.json('tlds-by-year.json', function(data){
 selected = []
 types = ["infrastructure","country-code", "sponsored", "generic"]
@@ -23,10 +30,12 @@ var arc = d3.svg.arc()
 var radius = d3.scale.linear()
   .domain([start, end])
   .range([0, height*.75]);
-  
-nav = d3.select("#flex").append("div")
-  .attr("id", "nav")
-  .attr('class','nav')
+
+nav = d3.select("#nav")
+
+info = nav.append('div')
+.attr('id','about')
+.html('<h1>Maybe you should put information about what the heck this is here, IDK')
 
 dates = nav.append('div')
 .attr('id','dates')
@@ -41,6 +50,8 @@ dates.selectAll('li')
   .on('click',function(key){
       makeSpiralbyDate(key)
     })
+
+dates.append('li').html('All Years').on('click', function(){allYears()})
 
 categories = nav.append('div').attr('id','types').html('<h1>Filter By Type</h1>')
 .selectAll('li')
@@ -74,30 +85,26 @@ unravel = nav.append('div').attr('id','viewunravel').html('<h1>View As List</h1>
   var seelist = svgactive ? null: 'none'
   var svgdisplay = svgactive ?  0 : 1
   var option = svgactive ? '<h1>View as Spiral</h1>' : '<h1>View As List</h1>'
-  
-  d3.select('#omg').transition().attr('width',width).attr('height',height)
-  
+  d3.select('.hover').style('display','none')
+  d3.select('#omg').transition().attr('width',width).attr('height',height)  
   unravel.html(option)
-  
-  d3.select('svg').style('opacity',svgdisplay)
-  
+  d3.select('svg').style('opacity',svgdisplay) 
   list.style('display',seelist)
   svg.active = svgactive
 })
 
 function makeList(){
   list.html('')
-  .selectAll('span')
+  .selectAll('h3')
   .data(selected).enter()
-  .append('span')
-  .attr('class','arc-text list')
+  .append('h3')
   .html(function(s){return s.name+" "})
   .style('color', function(s){ 
     y = s.registered.split('-')
     return color(y[0]*.1)
   })
   .on("mouseover", function(s){
-    d3.select(s).style("color", "orange")
+    d3.select(this).style("color", "orange")
   })
   .on("click", function(s){
     hover.style("display", null)
@@ -108,12 +115,10 @@ function makeList(){
       year = s.registered.split('-')
       return color(year[0]*.1)
     })
-    .style("font-weight",100);
     });
 }
 
 function makeSpiral(){
-selected = []
 var pieces = d3.range(start, end+0.001, (end-start)/5500);
 
 var spiral = d3.svg.line.radial()
@@ -134,11 +139,20 @@ var text = svg.append("text")
 .attr("xlink:href", "#spiral")
 .attr("startOffset", ".1%")
 .style("text-anchor","start")
-.attr("id","textpath")  
+.attr("id","textpath") 
 .attr('textLength', function(){
     p = document.querySelector('.spiral').getTotalLength()
     return p;
 })
+}
+
+function allYears(){
+selected = []
+text = d3.select('textPath')
+text.html('')
+d3.select('.hover').style('display','none')
+d3.select('svg').transition().attr("width", width).attr("height", height*1.75).style('padding-bottom',null)
+d3.select('g').transition().attr("transform", "translate(" + width/2 + "," + ((height*1.75)/2) +")")
 
 Object.keys(data).forEach(function(key) {
      data[key].forEach(function(d){
@@ -152,6 +166,7 @@ Object.keys(data).forEach(function(key) {
       .on("click", function(){
         hover.style("display", null)
         .html("<h2>"+d.name+"</h2><p>Registered on: "+d.registered+"</p><p>Sponsored by: "+d.spons+"</p><p>Type: "+d.type+"</p>")
+        d3.select('svg').style('padding-bottom',function(){ h = document.querySelector('.hover'); return h.clientHeight +'px'})
       })
       .on("mouseout", function(){
         d3.select(this).style("fill",color(key*.1)).style("font-weight",100);
@@ -164,9 +179,11 @@ makeList()
 }
 
 makeSpiral()
+allYears()
 
 function makeSpiralbyDate(d){
   selected = []
+  svg = d3.select('svg').style('padding-bottom',null)
   text = d3.select('textPath') 
   text.html('')
   .attr('textLength',null)
@@ -185,6 +202,7 @@ function makeSpiralbyDate(d){
       .on("click", function(){
         hover.style("display", null)
         .html("<h2>"+d.name+"</h2><p>Registered on: "+d.registered+"</p><p>Sponsored by: "+d.spons+"</p><p>Type: "+d.type+"</p>")
+        svg.style('padding-bottom',function(){ h = document.querySelector('.hover'); return h.clientHeight +'px'})
       })
       .on("mouseout", function(){
         d3.select(this).style("fill",color(key*.1)).style("font-weight",100);
@@ -203,6 +221,7 @@ makeList()
 
 function makeSpiralbyType(t){
   selected = []
+  svg = d3.select('svg').style('padding-bottom',null)
   text = d3.select('textPath')
   text.html('')
   .attr('textLength', null)
@@ -224,6 +243,7 @@ function makeSpiralbyType(t){
       .on("click", function(){
         hover.style("display", null)
         .html("<h2>"+d.name+"</h2><p>Registered on: "+d.registered+"</p><p>Sponsored by: "+d.spons+"</p><p>Type: "+d.type+"</p>")
+        svg.style('padding-bottom',function(){ h = document.querySelector('.hover'); return h.clientHeight +'px'})
       })
       .on("mouseout", function(){
         d3.select(this).style("fill",color(key*.1)).style("font-weight",100);
@@ -242,6 +262,7 @@ makeList()
 
 function genericSpiral(){
   selected = []
+  svg = d3.select('svg').style('padding-bottom',null)
   text = d3.select('textPath')
   text.html('')
   .attr('textLength', function(){
@@ -268,6 +289,7 @@ function genericSpiral(){
       .on("click", function(){
         hover.style("display", null)
         .html("<h2>"+d.name+"</h2><p>Registered on: "+d.registered+"</p><p>Sponsored by: "+d.spons+"</p><p>Type: "+d.type+"</p>")
+        svg.style('padding-bottom',function(){ h = document.querySelector('.hover'); return h.clientHeight +'px'})
       })
       .on("mouseout", function(){
         d3.select(this).style("fill",color(key*.1)).style("font-weight",100);

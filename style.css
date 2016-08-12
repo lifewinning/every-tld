@@ -1,73 +1,71 @@
-		 path.spiral {fill: none;}
-     .arc-text {
-      font: 14px sans-serif;
-      font-weight: 100;
-    }
+path.spiral {fill: none;}
+.arc-text {
+font: 14px sans-serif;
+font-weight: 100;
+}
 
-    .arc-center {
-      fill: none;
-    }
+h3 {
+font: 24px sans-serif;
+text-align: center;
+font-weight: 800;
+}
 
-    .hover{
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    opacity: .7;     
-    width: 100%;                  
-    padding: 5px;       
-    font: 14px sans-serif;    
-    background: papayawhip; 
-    border: 0px;    
-    pointer-events: none;
-    text-align: center;   
+.arc-center {
+fill: none;
+}
 
-  }
+.hover{
+position: fixed;
+bottom: 0;
+left: 0;
+opacity: .8;     
+width: 100%;                  
+padding: 5px;       
+font: 14px sans-serif; 
+font-weight: 800;   
+background: papayawhip; 
+border: 0px;    
+text-align: center;   
 
-  #flex{
-    display: flex;
-    align-items: center;
-    flex-wrap:wrap;
-    justify-content:center;
-  }
+}
 
-  #nav{
-    display: flex;
-    justify-content: center;
-    padding: 5px;
-    //width: 100%;
-    font: 14px sans-serif;
-    align-items: center;
-  }
-  #dates{
-    width: 25%;
-  }
-  #types{
-    width: 25%;
-  }
-  #viewunravel{
-    width: 25%;
-  }
-  
-  #list{
-     width: 100%;
-  }
+#flex{
+display: flex;
+align-items: center;
+flex-wrap:wrap;
+justify-content:center;
+}
 
-  .nav li {
-    padding: 5px;
-    display: inline-block;
-    font: 14px sans-serif;
-    background-color: #eee;
-    }
-  .nav li:hover{
-    background-color: papayawhip;
-  }
+#nav{
+display: flex;
+justify-content: center;
+padding: 5px;
+//width: 100%;
+font: 14px sans-serif;
+align-items: center;
+}
 
-  .selected li {
-    background-color: papayawhip;
-  }    
+#list{
+width: 100%;
+}
 
-  .nav h1{
-    font-family: sans-serif;
-    font-size: 14px;
-    text-align: center;
-  }
+.nav li {
+text-align: center;
+padding: 5px;
+display: inline-block;
+font: 14px sans-serif;
+background-color: #eee;
+}
+.nav li:hover{
+background-color: papayawhip;
+}
+
+.selected li {
+background-color: papayawhip;
+}    
+
+.nav h1{
+font-family: sans-serif;
+font-size: 14px;
+text-align: center;
+}
