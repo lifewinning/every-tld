@@ -48,7 +48,7 @@ dates.selectAll('li')
   .style('color',function(key){ return color(key*.1)})
   .html(function(key){return key+" "})
   .on('click',function(key){
-      makeSpiralbyDate(key)
+      filterSpiral('date',key)
     })
 
 dates.append('li').html('All Years').on('click', function(){allYears()})
@@ -60,9 +60,9 @@ categories = nav.append('div').attr('id','types').html('<h1>Filter By Type</h1>'
 .html(function(t){return t+" "})
 .on('click',function(t){
   if ( t != "generic"){
-    makeSpiralbyType(t)
+    filterSpiral('type',t)
   } else {
-    genericSpiral()
+    filterSpiral('generic',t)
   }
 })
 
@@ -153,7 +153,6 @@ text.html('')
 d3.select('.hover').style('display','none')
 d3.select('svg').transition().attr("width", width).attr("height", height*1.75).style('padding-bottom',null)
 d3.select('g').transition().attr("transform", "translate(" + width/2 + "," + ((height*1.75)/2) +")")
-
 Object.keys(data).forEach(function(key) {
      data[key].forEach(function(d){
       text.append('tspan')
@@ -181,68 +180,53 @@ makeList()
 makeSpiral()
 allYears()
 
-function makeSpiralbyDate(d){
+function filterSpiral(method,d){
   selected = []
+  hover.style('display','none')
   svg = d3.select('svg').style('padding-bottom',null)
   text = d3.select('textPath') 
   text.html('')
   .attr('textLength',null)
-  hover.style("display","none")
-  Object.keys(data).forEach(function(key) {
-  if (key == d){
-     data[key].forEach(function(d){
-      selected.push(d)
-      text.append('tspan')
-      .attr('class','arc-text')
-      .style('fill', color(key*.1))
-      .text(d.name+" ")
-      .on("mouseover", function(){
-        d3.select(this).style("fill", "orange")
+  if (method == "date"){
+    Object.keys(data).forEach(function(key){
+    if (key == d){
+       data[key].forEach(function(d){
+        selected.push(d)
+        text.append('tspan')
+        .attr('class','arc-text')
+        .style('fill', color(key*.1))
+        .text(d.name+" ")
+        .on("mouseover", function(){
+          d3.select(this).style("fill", "orange")
+        })
+        .on("click", function(){
+          hover.style("display", null)
+          .html("<h2>"+d.name+"</h2><p>Registered on: "+d.registered+"</p><p>Sponsored by: "+d.spons+"</p><p>Type: "+d.type+"</p>")
+          svg.style('padding-bottom',function(){ h = document.querySelector('.hover'); return h.clientHeight +'px'})
+        })
+        .on("mouseout", function(){
+          d3.select(this).style("fill",color(key*.1)).style("font-weight",100);
+          // hover.style("display","none")
+        });
       })
-      .on("click", function(){
-        hover.style("display", null)
-        .html("<h2>"+d.name+"</h2><p>Registered on: "+d.registered+"</p><p>Sponsored by: "+d.spons+"</p><p>Type: "+d.type+"</p>")
-        svg.style('padding-bottom',function(){ h = document.querySelector('.hover'); return h.clientHeight +'px'})
-      })
-      .on("mouseout", function(){
-        d3.select(this).style("fill",color(key*.1)).style("font-weight",100);
-        // hover.style("display","none")
-      });
-    })
+    }
+  })
   }
-})
-pathw = text[0][0].getBBox().width + 15
-pathh = text[0][0].getBBox().height +15
-
-d3.select('svg').transition().attr('width', pathw).attr('height', pathh)
-d3.select('g').attr('transform','translate('+pathw/2+','+pathh/2+')')
-makeList() 
-}
-
-function makeSpiralbyType(t){
-  selected = []
-  svg = d3.select('svg').style('padding-bottom',null)
-  text = d3.select('textPath')
-  text.html('')
-  .attr('textLength', null)
-  d3.select('svg').transition().attr('height', height)
-  //d3.select('.spiral').transition().attr("transform", "translate(0," + (height * 1.5)/5 +")");
- 
-  hover.style("display","none")
-  Object.keys(data).forEach(function(key) {
-     data[key].forEach(function(d){
-      if (d.type == t){
-      selected.push(d)
+  if (method == "type"){
+    Object.keys(data).forEach(function(key){
+     data[key].forEach(function(k){
+      if (k.type == d){
+      selected.push(k)
       text.append('tspan')
       .attr('class','arc-text')
       .style('fill', color(key*.1))
-      .text(d.name+" ")
+      .text(k.name+" ")
       .on("mouseover", function(){
         d3.select(this).style("fill", "orange")
       })
       .on("click", function(){
         hover.style("display", null)
-        .html("<h2>"+d.name+"</h2><p>Registered on: "+d.registered+"</p><p>Sponsored by: "+d.spons+"</p><p>Type: "+d.type+"</p>")
+        .html("<h2>"+k.name+"</h2><p>Registered on: "+k.registered+"</p><p>Sponsored by: "+k.spons+"</p><p>Type: "+k.type+"</p>")
         svg.style('padding-bottom',function(){ h = document.querySelector('.hover'); return h.clientHeight +'px'})
       })
       .on("mouseout", function(){
@@ -251,30 +235,11 @@ function makeSpiralbyType(t){
       });
       }   
     })
-})
-pathw = text[0][0].getBBox().width + 15
-pathh = text[0][0].getBBox().height +15
-
-d3.select('svg').transition().attr('width', pathw).attr('height', pathh)
-d3.select('g').attr('transform','translate('+pathw/2+','+pathh/2+')')
-makeList() 
-}
-
-function genericSpiral(){
-  selected = []
-  svg = d3.select('svg').style('padding-bottom',null)
-  text = d3.select('textPath')
-  text.html('')
-  .attr('textLength', function(){
-     p = document.querySelector('.spiral').getTotalLength()
-    return p;
   })
-  start = 0;
-  end = 27;
+  }
+  if (method == "generic"){
   d3.select('svg').transition().attr('height', height * 1.5).attr('width',width)
-  //d3.select('.spiral').transition().attr("transform", "translate(" +width/2+","+ (height*1.5)/2 +")");
-  hover.style("display","none")
-  Object.keys(data).forEach(function(key) {
+  Object.keys(data).forEach(function(key){
      data[key].forEach(function(d){
       if (d.type == "generic"){
       selected.push(d)
@@ -295,19 +260,11 @@ function genericSpiral(){
         d3.select(this).style("fill",color(key*.1)).style("font-weight",100);
         // hover.style("display","none")
       });
-      }   
-    })
-}) 
-pathw = text[0][0].getBBox().width + 15
-pathh = text[0][0].getBBox().height +15
-
-d3.select('svg').transition().attr('width', pathw).attr('height', pathh)
-d3.select('g').attr('transform','translate('+pathw/2+','+pathh/2+')')
-makeList() 
+  }})})}
+  pathw = text[0][0].getBBox().width + 15
+  pathh = text[0][0].getBBox().height +15
+  d3.select('svg').transition().attr('width', pathw).attr('height', pathh)
+  d3.select('g').attr('transform','translate('+pathw/2+','+pathh/2+')')
+  makeList() 
 }
-
 });
-
-
-
-
