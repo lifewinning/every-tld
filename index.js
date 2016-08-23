@@ -11,7 +11,7 @@ var theta = function(r) {
 var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
 var isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor);
 
-d3.json('tlds-by-year.json', function(data){
+d3.json('tlds-by-year-with-cc.json', function(data){
 selected = []
 types = ["infrastructure","country-code", "sponsored", "generic"]
 
@@ -157,24 +157,28 @@ var text = svg.append("text")
 }
 
 function pushkeys(key,d){
-      text.append('tspan')
-      .attr('class','arc-text')
-      .style('fill', color(key*.1))
-      .text(d.name+" ")
-      .on("mouseover", function(){
-        d3.select(this).style("fill", "orange")
-      })
-      .on("click", function(){
-        hover.style("display", null).style('width','100%').style('text-align','center')
-        .html("<h2>"+d.name+"</h2><p>Registered on: "+d.registered+"</p><p>Sponsored by: "+d.spons+"</p><p>Type: "+d.type+"</p>")
-        d3.select('svg').style('padding-bottom',function(){ h = document.querySelector('.hover'); return h.clientHeight +'px'})
-      })
-      .on("mouseout", function(){
-        d3.select(this).style("fill",color(key*.1)).style("font-weight",100);
-        // hover.style("display","none")
-      }); 
-      selected.push(d)  
-    } 
+  text.append('tspan')
+  .attr('class','arc-text')
+  .style('fill', color(key*.1))
+  .text(d.name+" ")
+  .on("mouseover", function(){
+    d3.select(this).style("fill", "orange")
+  })
+  .on("click", function(){
+    hover.style("display", null).style('width','100%').style('text-align','center')
+    if (!d.country_name){
+    hover.html("<h2>"+d.name+"</h2><p>Registered on: "+d.registered+"</p><p>Sponsored by: "+d.spons+"</p><p>Type: "+d.type+"</p><p>More Information at <a href="+d.iana_url+">IANA</a>")
+    } else {
+    hover.html("<h2>"+d.name+"</h2><p>("+d.country_name+")</p><p>Registered on: "+d.registered+"</p><p>Sponsored by: "+d.spons+"</p><p>Type: "+d.type+"</p><p>More Information at <a href="+d.iana_url+">IANA entry</a>") 
+    }
+    d3.select('svg').style('padding-bottom',function(){ h = document.querySelector('.hover'); return h.clientHeight +'px'})
+  })
+  .on("mouseout", function(){
+    d3.select(this).style("fill",color(key*.1)).style("font-weight",100);
+    // hover.style("display","none")
+  }); 
+  selected.push(d)  
+} 
 
 
 function allYears(){
