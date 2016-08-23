@@ -156,18 +156,7 @@ var text = svg.append("text")
 })
 }
 
-function allYears(){
-selected = []
-text = d3.select('textPath')
-text.html('').attr('textLength', function(){ 
-  p = d3.select('path')
-  return p.node().getTotalLength()
-})
-d3.select('.hover').style('display','none')
-d3.select('svg').transition().attr("width", width).attr("height", height*1.85).style('padding-bottom',null)
-d3.select('g').transition().attr("transform", "translate(" + width/2 + "," + ((height*1.85)/2) +")")
-Object.keys(data).forEach(function(key) {
-     data[key].forEach(function(d){
+function pushkeys(key,d){
       text.append('tspan')
       .attr('class','arc-text')
       .style('fill', color(key*.1))
@@ -185,7 +174,23 @@ Object.keys(data).forEach(function(key) {
         // hover.style("display","none")
       }); 
       selected.push(d)  
-    })
+    } 
+
+
+function allYears(){
+selected = []
+text = d3.select('textPath')
+text.html('').attr('textLength', function(){ 
+  p = d3.select('path')
+  return p.node().getTotalLength()
+})
+d3.select('.hover').style('display','none')
+d3.select('svg').transition().attr("width", width).attr("height", height*1.85).style('padding-bottom',null)
+d3.select('g').transition().attr("transform", "translate(" + width/2 + "," + ((height*1.85)/2) +")")
+Object.keys(data).forEach(function(key){
+  data[key].forEach(function(d){
+    pushkeys(key,d)
+  })
 })
 makeList()     
 }
@@ -204,25 +209,9 @@ function filterSpiral(method,d){
     // window.location.hash = method+d
     Object.keys(data).forEach(function(key){
     if (key == d){
-       data[key].forEach(function(d){
-        selected.push(d)
-        text.append('tspan')
-        .attr('class','arc-text')
-        .style('fill', color(key*.1))
-        .text(d.name+" ")
-        .on("mouseover", function(){
-          d3.select(this).style("fill", "orange")
-        })
-        .on("click", function(){
-          hover.style("display", null).style('width','100%').style('text-align','center')
-          .html("<h2>"+d.name+"</h2><p>Registered on: "+d.registered+"</p><p>Sponsored by: "+d.spons+"</p><p>Type: "+d.type+"</p>")
-          svg.style('padding-bottom',function(){ h = document.querySelector('.hover'); return h.clientHeight +'px'})
-        })
-        .on("mouseout", function(){
-          d3.select(this).style("fill",color(key*.1)).style("font-weight",100);
-          // hover.style("display","none")
-        });
-      })
+      data[key].forEach(function(k){
+      pushkeys(key,k)
+    })
     }
   })
   }
@@ -231,24 +220,8 @@ function filterSpiral(method,d){
     Object.keys(data).forEach(function(key){
      data[key].forEach(function(k){
       if (k.type == d){
-      selected.push(k)
-      text.append('tspan')
-      .attr('class','arc-text')
-      .style('fill', color(key*.1))
-      .text(k.name+" ")
-      .on("mouseover", function(){
-        d3.select(this).style("fill", "orange")
-      })
-      .on("click", function(){
-        hover.style("display", null).style('width','100%').style('text-align','center')
-        .html("<h2>"+k.name+"</h2><p>Registered on: "+k.registered+"</p><p>Sponsored by: "+k.spons+"</p><p>Type: "+k.type+"</p>")
-        svg.style('padding-bottom',function(){ h = document.querySelector('.hover'); return h.clientHeight +'px'})
-      })
-      .on("mouseout", function(){
-        d3.select(this).style("fill",color(key*.1)).style("font-weight",100);
-        // hover.style("display","none")
-      });
-      }   
+      pushkeys(key,k)
+      } 
     })
   })
   }
@@ -258,25 +231,8 @@ function filterSpiral(method,d){
   Object.keys(data).forEach(function(key){
      data[key].forEach(function(d){
       if (d.type == "generic"){
-      selected.push(d)
-       text.append('tspan')
-      .attr('class','arc-text')
-      // .style('font-size','12px')
-      .style('fill', color(key*.1))
-      .text(d.name+" ")
-      .on("mouseover", function(){
-        d3.select(this).style("fill", "orange")
-      })
-      .on("click", function(){
-        hover.style("display", null).style('width','100%').style('text-align','center')
-        .html("<h2>"+d.name+"</h2><p>Registered on: "+d.registered+"</p><p>Sponsored by: "+d.spons+"</p><p>Type: "+d.type+"</p>")
-        svg.style('padding-bottom',function(){ h = document.querySelector('.hover'); return h.clientHeight +'px'})
-      })
-      .on("mouseout", function(){
-        d3.select(this).style("fill",color(key*.1)).style("font-weight",100);
-        // hover.style("display","none")
-      });
-  }})})}
+        pushkeys(key,d)
+      }})})}
   pathw = text[0][0].getBBox().width + 15
   pathh = text[0][0].getBBox().height +15
   d3.select('svg').transition().attr('width', pathw).attr('height', pathh)
