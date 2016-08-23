@@ -11,10 +11,6 @@ var theta = function(r) {
 var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
 var isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor);
 
-if (isChrome || isSafari){
-  console.log('broken Arabic 4 u')
-}
-
 d3.json('tlds-by-year.json', function(data){
 selected = []
 types = ["infrastructure","country-code", "sponsored", "generic"]
@@ -35,7 +31,7 @@ nav = d3.select("#nav")
 
 info = nav.append('div')
 .attr('id','about')
-.html('<h1>Maybe you should put information about what the heck this is here, IDK')
+.html('<h1>Every Single Top-Level Domain</h1>')
 
 dates = nav.append('div')
 .attr('id','dates')
@@ -44,7 +40,8 @@ dates = nav.append('div')
 
 dates.selectAll('li')
 .data(Object.keys(data))
-.enter().append('li').append('a')
+.enter().append('li').attr('id',function(d){return 'date'+d})
+.append('a')
   .style('color',function(key){ return color(key*.1)})
   .html(function(key){return key+" "})
   .on('click',function(key){
@@ -56,7 +53,7 @@ dates.append('li').html('All Years').on('click', function(){allYears()})
 categories = nav.append('div').attr('id','types').html('<h1>Filter By Type</h1>')
 .selectAll('li')
 .data(types)
-.enter().append('li')
+.enter().append('li').attr('id', function(d){return d})
 .html(function(t){return t+" "})
 .on('click',function(t){
   if ( t != "generic"){
@@ -79,19 +76,32 @@ var svg = d3.select("#flex").append("svg")
     .attr('id','omg')
     .attr("transform", "translate(" + width/2 + "," + ((height*1.75)/2) +")")
 
-unravel = nav.append('div').attr('id','viewunravel').html('<h1>View As List</h1>')
+unravel = nav.append('div').attr('id','viewunravel')
+unravelh1 = unravel.append('h1').html('View As List')
 .on('click',function(){
   var svgactive = svg.active ? false : true
   var seelist = svgactive ? null: 'none'
   var svgdisplay = svgactive ?  0 : 1
-  var option = svgactive ? '<h1>View as Spiral</h1>' : '<h1>View As List</h1>'
+  var option = svgactive ? 'View as Spiral' : 'View As List'
   d3.select('.hover').style('display','none')
   d3.select('#omg').transition().attr('width',width).attr('height',height)  
-  unravel.html(option)
+  unravelh1.html(option)
   d3.select('svg').style('opacity',svgdisplay) 
   list.style('display',seelist)
   svg.active = svgactive
 })
+
+if (isChrome || isSafari){
+  webkith1 = unravel.append('h1').html("What's Up With The Broken Arabic?")
+  .on('click', function(){
+    hov = d3.select('.hover').style('display',null).style('text-align','left').style('width',null) .html('')
+    hov.append('h1').style('margin','15px') 
+    .html("You may have noticed that the Arabic characters in the spiral display are broken. This is because deep within the Webkit SVG rendering engine, someone made the decision to make text on a path do something really fucking stupid that makes calligraphic languages break. This is a documented problem that other people have run into before. No one is going to fix it because Webkit is a gnarly code monster and not enough people who deal with non-English languages care enough to bother to make this extremely small thing work. Viewing this in Firefox is slower, but the Arabic renders correctly there. Sorry!")
+    hov.append('h2').style('margin','15px').html('Close this message').on('click', function(){
+      hov.html('').style('display','none').style('width','100%').style('text-align','center')
+    })
+  })
+}
 
 function makeList(){
   list.html('')
@@ -107,7 +117,7 @@ function makeList(){
     d3.select(this).style("color", "orange")
   })
   .on("click", function(s){
-    hover.style("display", null)
+    hover.style("display", null).style('width','100%').style('text-align','center')
     .html("<h2>"+s.name+"</h2><p>Registered on: "+s.registered+"</p><p>Sponsored by: "+s.spons+"</p><p>Type: "+s.type+"</p>")
   })
   .on("mouseout", function(){
@@ -149,10 +159,13 @@ var text = svg.append("text")
 function allYears(){
 selected = []
 text = d3.select('textPath')
-text.html('')
+text.html('').attr('textLength', function(){ 
+  p = d3.select('path')
+  return p.node().getTotalLength()
+})
 d3.select('.hover').style('display','none')
-d3.select('svg').transition().attr("width", width).attr("height", height*1.75).style('padding-bottom',null)
-d3.select('g').transition().attr("transform", "translate(" + width/2 + "," + ((height*1.75)/2) +")")
+d3.select('svg').transition().attr("width", width).attr("height", height*1.85).style('padding-bottom',null)
+d3.select('g').transition().attr("transform", "translate(" + width/2 + "," + ((height*1.85)/2) +")")
 Object.keys(data).forEach(function(key) {
      data[key].forEach(function(d){
       text.append('tspan')
@@ -160,10 +173,10 @@ Object.keys(data).forEach(function(key) {
       .style('fill', color(key*.1))
       .text(d.name+" ")
       .on("mouseover", function(){
-        d3.select(this).style("color", "orange")
+        d3.select(this).style("fill", "orange")
       })
       .on("click", function(){
-        hover.style("display", null)
+        hover.style("display", null).style('width','100%').style('text-align','center')
         .html("<h2>"+d.name+"</h2><p>Registered on: "+d.registered+"</p><p>Sponsored by: "+d.spons+"</p><p>Type: "+d.type+"</p>")
         d3.select('svg').style('padding-bottom',function(){ h = document.querySelector('.hover'); return h.clientHeight +'px'})
       })
@@ -188,6 +201,7 @@ function filterSpiral(method,d){
   text.html('')
   .attr('textLength',null)
   if (method == "date"){
+    // window.location.hash = method+d
     Object.keys(data).forEach(function(key){
     if (key == d){
        data[key].forEach(function(d){
@@ -200,7 +214,7 @@ function filterSpiral(method,d){
           d3.select(this).style("fill", "orange")
         })
         .on("click", function(){
-          hover.style("display", null)
+          hover.style("display", null).style('width','100%').style('text-align','center')
           .html("<h2>"+d.name+"</h2><p>Registered on: "+d.registered+"</p><p>Sponsored by: "+d.spons+"</p><p>Type: "+d.type+"</p>")
           svg.style('padding-bottom',function(){ h = document.querySelector('.hover'); return h.clientHeight +'px'})
         })
@@ -213,6 +227,7 @@ function filterSpiral(method,d){
   })
   }
   if (method == "type"){
+   // window.location.hash = method+d
     Object.keys(data).forEach(function(key){
      data[key].forEach(function(k){
       if (k.type == d){
@@ -225,7 +240,7 @@ function filterSpiral(method,d){
         d3.select(this).style("fill", "orange")
       })
       .on("click", function(){
-        hover.style("display", null)
+        hover.style("display", null).style('width','100%').style('text-align','center')
         .html("<h2>"+k.name+"</h2><p>Registered on: "+k.registered+"</p><p>Sponsored by: "+k.spons+"</p><p>Type: "+k.type+"</p>")
         svg.style('padding-bottom',function(){ h = document.querySelector('.hover'); return h.clientHeight +'px'})
       })
@@ -238,6 +253,7 @@ function filterSpiral(method,d){
   })
   }
   if (method == "generic"){
+  //window.location.hash = 'generic'
   d3.select('svg').transition().attr('height', height * 1.5).attr('width',width)
   Object.keys(data).forEach(function(key){
      data[key].forEach(function(d){
@@ -252,7 +268,7 @@ function filterSpiral(method,d){
         d3.select(this).style("fill", "orange")
       })
       .on("click", function(){
-        hover.style("display", null)
+        hover.style("display", null).style('width','100%').style('text-align','center')
         .html("<h2>"+d.name+"</h2><p>Registered on: "+d.registered+"</p><p>Sponsored by: "+d.spons+"</p><p>Type: "+d.type+"</p>")
         svg.style('padding-bottom',function(){ h = document.querySelector('.hover'); return h.clientHeight +'px'})
       })
