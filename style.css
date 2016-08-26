@@ -5,7 +5,7 @@ font-weight: 100;
 }
 
 h3 {
-font: 24px sans-serif;
+font: 24px 'Helvetica','Arial',sans-serif;
 text-align: center;
 font-weight: 800;
 }
@@ -21,7 +21,7 @@ left: 0;
 opacity: .8;     
 // width: 100%;                  
 padding: 15px;       
-font: 14px sans-serif; 
+font: 14px 'Helvetica','Arial',sans-serif; 
 font-weight: 800;   
 background: papayawhip; 
 border: 0px;    
@@ -41,7 +41,7 @@ display: flex;
 justify-content: center;
 padding: 5px;
 //width: 100%;
-font: 14px sans-serif;
+font: 14px 'Helvetica','Arial',sans-serif;
 align-items: center;
 }
 
@@ -85,7 +85,6 @@ background-color: papayawhip;
 }    
 
 .nav h1{
-font-family: sans-serif;
+font-family: 'Helvetica','Arial',sans-serif;
 font-size: 14px;
-text-align: center;
 }

@@ -3,7 +3,7 @@
 var width = window.innerWidth,
 height = window.innerHeight
 start = 0
-end = 33;
+end = 39;
 var theta = function(r) {
   return -2*Math.PI*r;
 };
@@ -69,6 +69,8 @@ hover = d3.select("#flex").append("div")
 .attr("class", "hover")
 .style("display","none")
 
+//detect mobile, eventually
+
 var svg = d3.select("#flex").append("svg")
     .attr("width", width)
     .attr("height", height*1.75)
@@ -118,9 +120,13 @@ function makeList(){
   })
   .on("click", function(s){
     hover.style("display", null).style('width','100%').style('text-align','center')
-    .html("<h2>"+s.name+"</h2><p>Registered on: "+s.registered+"</p><p>Sponsored by: "+s.spons+"</p><p>Type: "+s.type+"</p>")
+ if (!s.country_name){
+    hover.html("<h2>"+s.name+"</h2><p>Registered on: "+s.registered+"</p><p>Sponsored by: "+s.spons+"</p><p>Type: "+s.type+"</p><p>More Information at <a href="+s.iana_url+">IANA</a>")
+    } else {
+    hover.html("<h2>"+s.name+"</h2><p>("+s.country_name+")</p><p>Registered on: "+d.registered+"</p><p>Sponsored by: "+s.spons+"</p><p>Type: "+s.type+"</p><p>More Information at <a href="+s.iana_url+">IANA entry</a>") 
+    }
   })
-  .on("mouseout", function(){
+  hover.on("mouseout", function(){
     d3.select(this).style("color",function(s){
       year = s.registered.split('-')
       return color(year[0]*.1)
@@ -129,7 +135,7 @@ function makeList(){
 }
 
 function makeSpiral(){
-var pieces = d3.range(start, end+0.001, (end-start)/5500);
+var pieces = d3.range(start, end+0.001, (end-start)/5600);
 
 var spiral = d3.svg.line.radial()
   .interpolate("cardinal")
@@ -147,13 +153,13 @@ svg.selectAll(".spiral")
 var text = svg.append("text")
 .append("textPath") 
 .attr("xlink:href", "#spiral")
-.attr("startOffset", ".1%")
+.attr("startOffset", ".08%")
 .style("text-anchor","start")
 .attr("id","textpath") 
-.attr('textLength', function(){
-    p = document.querySelector('.spiral').getTotalLength()
-    return p;
-})
+// .attr('textLength', function(){
+//     p = document.querySelector('.spiral').getTotalLength()
+//     return p;
+// })
 }
 
 function pushkeys(key,d){
@@ -184,10 +190,11 @@ function pushkeys(key,d){
 function allYears(){
 selected = []
 text = d3.select('textPath')
-text.html('').attr('textLength', function(){ 
-  p = d3.select('path')
-  return p.node().getTotalLength()
-})
+text.html('')
+// .attr('textLength', function(){ 
+//   p = d3.select('path')
+//   return p.node().getTotalLength()
+// })
 d3.select('.hover').style('display','none')
 d3.select('svg').transition().attr("width", width).attr("height", height*1.85).style('padding-bottom',null)
 d3.select('g').transition().attr("transform", "translate(" + width/2 + "," + ((height*1.85)/2) +")")
@@ -208,9 +215,9 @@ function filterSpiral(method,d){
   svg = d3.select('svg').style('padding-bottom',null)
   text = d3.select('textPath') 
   text.html('')
-  .attr('textLength',null)
+  // .attr('textLength',null)
   if (method == "date"){
-    // window.location.hash = method+d
+    window.location.hash = method+d
     Object.keys(data).forEach(function(key){
     if (key == d){
       data[key].forEach(function(k){
@@ -220,7 +227,7 @@ function filterSpiral(method,d){
   })
   }
   if (method == "type"){
-   // window.location.hash = method+d
+   window.location.hash = method+d
     Object.keys(data).forEach(function(key){
      data[key].forEach(function(k){
       if (k.type == d){
@@ -230,7 +237,12 @@ function filterSpiral(method,d){
   })
   }
   if (method == "generic"){
-  //window.location.hash = 'generic'
+  window.location.hash = 'generic'
+  text.html('')
+  // .attr('textLength', function(){ 
+  // p = d3.select('path')
+  // return p.node().getTotalLength()
+  // })
   d3.select('svg').transition().attr('height', height * 1.5).attr('width',width)
   Object.keys(data).forEach(function(key){
      data[key].forEach(function(d){
