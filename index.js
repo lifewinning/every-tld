@@ -19,10 +19,6 @@ var color = d3.scale.linear()
     .range(["hsl(-180,60%,50%)", "hsl(180,60%,50%)"])
     .interpolate(function(a, b) { var i = d3.interpolateString(a, b); return function(t) { return d3.hsl(i(t)); }; });
 
-var arc = d3.svg.arc()
-  .startAngle(0)
-  .endAngle(2*Math.PI);
-
 var radius = d3.scale.linear()
   .domain([start, end])
   .range([0, height*.75]);
@@ -135,7 +131,7 @@ function makeList(){
 }
 
 function makeSpiral(){
-var pieces = d3.range(start, end+0.001, (end-start)/5600);
+var pieces = d3.range(start, end+0.001, (end-start)/5500);
 
 var spiral = d3.svg.line.radial()
   .interpolate("cardinal")
@@ -191,10 +187,15 @@ function allYears(){
 selected = []
 text = d3.select('textPath')
 text.html('')
-// .attr('textLength', function(){ 
-//   p = d3.select('path')
-//   return p.node().getTotalLength()
-// })
+.attr('textLength', function(){ 
+  p = d3.select('path')
+  return p.node().getTotalLength()
+})
+alsotext = d3.select('text')
+.attr('textLength', function(){ 
+  p = d3.select('path')
+  return p.node().getTotalLength()
+})
 d3.select('.hover').style('display','none')
 d3.select('svg').transition().attr("width", width).attr("height", height*1.85).style('padding-bottom',null)
 d3.select('g').transition().attr("transform", "translate(" + width/2 + "," + ((height*1.85)/2) +")")
@@ -215,7 +216,9 @@ function filterSpiral(method,d){
   svg = d3.select('svg').style('padding-bottom',null)
   text = d3.select('textPath') 
   text.html('')
-  // .attr('textLength',null)
+  .attr('textLength',null)
+  alsotext = d3.select('text')
+  .attr('textLength', null)
   if (method == "date"){
     window.location.hash = method+d
     Object.keys(data).forEach(function(key){
@@ -238,7 +241,6 @@ function filterSpiral(method,d){
   }
   if (method == "generic"){
   window.location.hash = 'generic'
-  text.html('')
   // .attr('textLength', function(){ 
   // p = d3.select('path')
   // return p.node().getTotalLength()
@@ -249,8 +251,8 @@ function filterSpiral(method,d){
       if (d.type == "generic"){
         pushkeys(key,d)
       }})})}
-  pathw = text[0][0].getBBox().width + 15
-  pathh = text[0][0].getBBox().height +15
+  pathw = document.querySelector('text').getBBox().width + 15
+  pathh = document.querySelector('text').getBBox().height +15
   d3.select('svg').transition().attr('width', pathw).attr('height', pathh)
   d3.select('g').attr('transform','translate('+pathw/2+','+pathh/2+')')
   makeList() 
