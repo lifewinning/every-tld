@@ -14,6 +14,9 @@ font-weight: 800;
 fill: none;
 }
 
+.orange{
+  fill: orange;
+}
 .hover{
 position: fixed;
 bottom: 0;

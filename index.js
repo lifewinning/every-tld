@@ -95,7 +95,7 @@ if (isChrome || isSafari){
     hov = d3.select('.hover').style('display',null).style('text-align','left').style('width',null) .html('')
     hov.append('h1').style('margin','15px') 
     .html("You may have noticed that the Arabic characters in the spiral display are broken. This is because deep within the Webkit SVG rendering engine, someone made the decision to make text on a path do something really fucking stupid that makes calligraphic languages break. This is a documented problem that other people have run into before. No one is going to fix it because Webkit is a gnarly code monster and not enough people who deal with non-English languages care enough to bother to make this extremely small thing work. Viewing this in Firefox is slower, but the Arabic renders correctly there. Sorry!")
-    hov.append('h2').style('margin','15px').html('Close this message').on('click', function(){
+    hov.append('h2').style('margin','15px').style('background-color','cyan').html('Close this message').on('click', function(){
       hov.html('').style('display','none').style('width','100%').style('text-align','center')
     })
   })
@@ -112,7 +112,7 @@ function makeList(){
     return color(y[0]*.1)
   })
   .on("mouseover", function(s){
-    d3.select(this).style("color", "orange")
+    d3.select(this).attr('class','orange')
   })
   .on("click", function(s){
     hover.style("display", null).style('width','100%').style('text-align','center')
