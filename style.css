@@ -1,5 +1,10 @@
 @media only screen and (min-width : 320px) {
-
+	body{
+		overflow: scroll;
+	}
+	svg{
+		overflow: scroll;
+	}
 	path.spiral {fill: none;}
 	.arc-text {
 	font: 14px sans-serif;

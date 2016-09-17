@@ -76,12 +76,10 @@ hover = d3.select("#flex").append("div")
 //detect mobile, eventually
 
 var svg = d3.select("#flex").append("svg")
-    .attr("width", width)
-    .attr("height", height*1.75)
+    .attr("width", width).attr("height", height*1.75)
     .append("g")
     .attr('id','omg')
     .attr("transform", "translate(" + width/2 + "," + ((height*1.75)/2) +")")
-    .call(zoom)
 
 unravel = nav.append('div').attr('id','viewunravel')
 unravelh1 = unravel.append('h1').html('View As List')
@@ -218,6 +216,16 @@ makeList()
 
 makeSpiral()
 allYears()
+
+if (width < 481){
+  console.log(width)
+  pathw = document.querySelector('text').getBBox().width + 15
+  pathh = document.querySelector('text').getBBox().height +15
+  console.log(pathw)
+  console.log(pathh)
+  d3.select('svg').transition().attr('width', pathw*2).attr('height', pathh*2)
+  //d3.select('g').attr('transform','translate('+pathw/4+','+pathh/4+')')
+}
 
 function filterSpiral(method,d){
   selected = []
