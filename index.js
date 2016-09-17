@@ -8,12 +8,20 @@ var theta = function(r) {
   return -2*Math.PI*r;
 };
 
+var zoom = d3.behavior.zoom()
+    .scaleExtent([1, 10])
+    .on("zoom", zoomed);
+
+function zoomed() {
+  container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+}
+
 var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
 var isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor);
 
 d3.json('tlds-by-year-with-cc.json', function(data){
 selected = []
-types = ["infrastructure","country-code", "sponsored", "generic"]
+types = ["infrastructure","country-code", "sponsored", "generic","test"]
 
 var color = d3.scale.linear()
     .range(["hsl(-180,60%,50%)", "hsl(180,60%,50%)"])
@@ -27,7 +35,7 @@ nav = d3.select("#nav")
 
 info = nav.append('div')
 .attr('id','about')
-.html('<h1>Every Single Top-Level Domain</h1>')
+.html('<h1>Every Top Level Domain</h1>')
 
 dates = nav.append('div')
 .attr('id','dates')
@@ -73,6 +81,7 @@ var svg = d3.select("#flex").append("svg")
     .append("g")
     .attr('id','omg')
     .attr("transform", "translate(" + width/2 + "," + ((height*1.75)/2) +")")
+    .call(zoom)
 
 unravel = nav.append('div').attr('id','viewunravel')
 unravelh1 = unravel.append('h1').html('View As List')
@@ -92,7 +101,7 @@ unravelh1 = unravel.append('h1').html('View As List')
 if (isChrome || isSafari){
   webkith1 = unravel.append('h1').html("What's Up With The Broken Arabic?")
   .on('click', function(){
-    hov = d3.select('.hover').style('display',null).style('text-align','left').style('width',null) .html('')
+    hov = d3.select('.hover').style('display',null).style('text-align','left').style('width',null).html('')
     hov.append('h1').style('margin','15px') 
     .html("You may have noticed that the Arabic characters in the spiral display are broken. This is because deep within the Webkit SVG rendering engine, someone made the decision to make text on a path do something really fucking stupid that makes calligraphic languages break. This is a documented problem that other people have run into before. No one is going to fix it because Webkit is a gnarly code monster and not enough people who deal with non-English languages care enough to bother to make this extremely small thing work. Viewing this in Firefox is slower, but the Arabic renders correctly there. Sorry!")
     hov.append('h2').style('margin','15px').style('background-color','cyan').html('Close this message').on('click', function(){
