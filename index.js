@@ -110,31 +110,29 @@ if (isChrome || isSafari){
 
 function makeList(){
   list.html('')
-  .selectAll('h3')
+  list.selectAll('div')
   .data(selected).enter()
-  .append('h3')
-  .html(function(s){return s.name+" "})
+  .append('div')
+  .html(function(s){return "<h3>"+s.name+"</h3>"})
   .style('color', function(s){ 
     y = s.registered.split('-')
-    return color(y[0]*.1)
+    return color(y[0]*.1)})
+   .on("click", function(s){
+    h3 = d3.selectAll('h3').style('opacity',.5)
+    d3.select(this).select('h3').style('opacity', 1)
+    div = d3.select('#'+s.name.replace('.',''))
+    hide = d3.selectAll('.listspan').style('display','none')
+    console.log(div)
+    div.style("display", null)
   })
-  .on("mouseover", function(s){
-    d3.select(this).attr('class','orange')
-  })
-  .on("click", function(s){
-    hover.style("display", null).style('width','100%').style('text-align','center')
- if (!s.country_name){
-    hover.html("<h2>"+s.name+"</h2><p>Registered on: "+s.registered+"</p><p>Sponsored by: "+s.spons+"</p><p>Type: "+s.type+"</p><p>More Information at <a href="+s.iana_url+">IANA</a>")
+  .append('div').attr('class','listspan').attr('id', function(s){return s.name.replace('.','')}).style('display','none')
+  .html(function(s){ 
+    if (!s.country_name){
+     return "Registered on: "+s.registered+"<br>Sponsored by: "+s.spons+"<br>Type: "+s.type+"<br>More Information at <a href="+s.iana_url+">IANA</a>";
     } else {
-    hover.html("<h2>"+s.name+"</h2><p>("+s.country_name+")</p><p>Registered on: "+d.registered+"</p><p>Sponsored by: "+s.spons+"</p><p>Type: "+s.type+"</p><p>More Information at <a href="+s.iana_url+">IANA entry</a>") 
+      return "Registered on: "+s.registered+"<br>Sponsored by: "+s.spons+"<br>Type: "+s.type+" ("+s.country_name+")<br>More Information at <a href="+s.iana_url+">IANA</a>"
     }
   })
-  hover.on("mouseout", function(){
-    d3.select(this).style("color",function(s){
-      year = s.registered.split('-')
-      return color(year[0]*.1)
-    })
-    });
 }
 
 function makeSpiral(){
@@ -170,9 +168,9 @@ function pushkeys(key,d){
   .attr('class','arc-text')
   .style('fill', color(key*.1))
   .text(d.name+" ")
-  .on("mouseover", function(){
-    d3.select(this).style("fill", "orange")
-  })
+  // .on("mouseover", function(){
+  //   d3.select(this).style("fill", "orange")
+  // })
   .on("click", function(){
     hover.style("display", null).style('width','100%').style('text-align','center')
     if (!d.country_name){
@@ -181,14 +179,13 @@ function pushkeys(key,d){
     hover.html("<h2>"+d.name+"</h2><p>("+d.country_name+")</p><p>Registered on: "+d.registered+"</p><p>Sponsored by: "+d.spons+"</p><p>Type: "+d.type+"</p><p>More Information at <a href="+d.iana_url+">IANA entry</a>") 
     }
     d3.select('svg').style('padding-bottom',function(){ h = document.querySelector('.hover'); return h.clientHeight +'px'})
-  })
-  .on("mouseout", function(){
-    d3.select(this).style("fill",color(key*.1)).style("font-weight",100);
+  });
+  // .on("mouseout", function(){
+  //   d3.select(this).style("fill",color(key*.1)).style("font-weight",100);
     // hover.style("display","none")
-  }); 
+  // }; 
   selected.push(d)  
-} 
-
+}
 
 function allYears(){
 selected = []
@@ -218,13 +215,9 @@ makeSpiral()
 allYears()
 
 if (width < 481){
-  console.log(width)
-  pathw = document.querySelector('text').getBBox().width + 15
-  pathh = document.querySelector('text').getBBox().height +15
-  console.log(pathw)
-  console.log(pathh)
-  d3.select('svg').transition().attr('width', pathw*2).attr('height', pathh*2)
-  //d3.select('g').attr('transform','translate('+pathw/4+','+pathh/4+')')
+  hidesvg = d3.select('svg').style('display','none')
+  hidediv = d3.select('#viewunravel').style('display','none')
+  list.style('display',null)
 }
 
 function filterSpiral(method,d){
@@ -237,7 +230,7 @@ function filterSpiral(method,d){
   alsotext = d3.select('text')
   .attr('textLength', null)
   if (method == "date"){
-    window.location.hash = method+d
+    window.location.hash = method+"-"+d
     Object.keys(data).forEach(function(key){
     if (key == d){
       data[key].forEach(function(k){
@@ -247,7 +240,7 @@ function filterSpiral(method,d){
   })
   }
   if (method == "type"){
-   window.location.hash = method+d
+   window.location.hash = method+"-"+d
     Object.keys(data).forEach(function(key){
      data[key].forEach(function(k){
       if (k.type == d){
@@ -257,7 +250,7 @@ function filterSpiral(method,d){
   })
   }
   if (method == "generic"){
-  window.location.hash = 'generic'
+  window.location.hash = 'type-generic'
   // .attr('textLength', function(){ 
   // p = d3.select('path')
   // return p.node().getTotalLength()

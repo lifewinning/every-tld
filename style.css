@@ -23,6 +23,7 @@
 
 	.orange{
 	  fill: orange;
+	  color: orange;
 	}
 	.hover{
 	position: fixed;
@@ -87,6 +88,18 @@
 	#nav div{
 	text-align: center;
 	}
+	.listspan{
+		border: 1px black dashed;
+		// background-color:papayawhip;
+		text-align: left;
+		color: black;
+		margin-top: 1px;
+		font-family: sans-serif;
+		padding: 12px;
+		line-height: 1.25;
+		font-size: 12px;
+
+	}
 }
 
 @media only screen and (min-width : 1024px) {
@@ -112,5 +125,8 @@
 
 	#list h3{
 	  // rotate, just because
+	}
+	.listspan{
+		text-align: center;
 	}
 }
