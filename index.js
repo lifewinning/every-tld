@@ -172,7 +172,7 @@ function pushkeys(key,d){
   //   d3.select(this).style("fill", "orange")
   // })
   .on("click", function(){
-    d3.select(this).style('fill','orange')
+    // d3.select(this).style('fill','orange')
     hover.style("display", null).style('width','100%').style('text-align','center')
     if (!d.country_name){
     hover.html("<h2>"+d.name+"</h2><p>Registered on: "+d.registered+"</p><p>Sponsored by: "+d.spons+"</p><p>Type: "+d.type+"</p><p>More Information at <a href="+d.iana_url+">IANA</a>")
